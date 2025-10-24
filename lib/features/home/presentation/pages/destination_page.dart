@@ -1500,7 +1500,9 @@ class _DestinationPageState extends State<DestinationPage> {
                       );
                     },
                     child: Container(
-                      height: size.width * 0.14,
+                      constraints: BoxConstraints(
+                        minHeight: size.width * 0.14,
+                      ),
                       decoration: BoxDecoration(
                         gradient: _brandGradient,
                         borderRadius: BorderRadius.circular(18),
@@ -1519,7 +1521,9 @@ class _DestinationPageState extends State<DestinationPage> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 12),
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                         child: Row(
                           children: [
                             Container(
