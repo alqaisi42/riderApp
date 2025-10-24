@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +11,6 @@ import 'package:latlong2/latlong.dart' as fmlt;
 import '../../../../common/common.dart';
 import '../../../../common/pickup_icon.dart';
 import '../../../../core/utils/custom_button.dart';
-import '../../../../core/utils/custom_navigation_icon.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../account/presentation/pages/account_page.dart';
@@ -26,6 +27,22 @@ class HomeBodyWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final screenWidth = size.width;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final Color primary = theme.colorScheme.primary;
+    final Color secondary = theme.colorScheme.secondary;
+    final Color scaffold = theme.scaffoldBackgroundColor;
+    final Color accentBlend = Color.lerp(primary, secondary, 0.35) ?? primary;
+    final Color glassBackground =
+        scaffold.withOpacity(isDark ? 0.55 : 0.9);
+    final Color borderColor = primary.withOpacity(isDark ? 0.4 : 0.12);
+    final Color topOverlayStart = primary.withOpacity(isDark ? 0.28 : 0.22);
+    final Color topOverlayEnd = scaffold.withOpacity(0.0);
+    final Color bottomOverlayBase =
+        Color.lerp(scaffold, accentBlend, isDark ? 0.2 : 0.12) ?? scaffold;
+    final Color bottomOverlayStart =
+        bottomOverlayBase.withOpacity(isDark ? 0.82 : 0.68);
+    final Color bottomOverlayEnd = scaffold.withOpacity(0.0);
     return BlocProvider.value(
       value: cont.read<HomeBloc>(),
       child: BlocBuilder<HomeBloc, HomeState>(
@@ -409,6 +426,40 @@ class HomeBodyWidget extends StatelessWidget {
                   ],
                 ),
               ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: size.height * 0.28,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [topOverlayStart, topOverlayEnd],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: size.height * 0.22,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [bottomOverlayStart, bottomOverlayEnd],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               // Locate Me
               Positioned(
                 bottom: size.height * 0.51,
@@ -417,16 +468,32 @@ class HomeBodyWidget extends StatelessWidget {
                   children: [
                     if (context.read<HomeBloc>().mapType == 'google_map')
                       PopupMenuButton<MapType>(
-                        color: AppColors.white,
+                        color: theme.scaffoldBackgroundColor,
                         icon: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1),
+                            gradient: LinearGradient(
+                              colors: [
+                                primary.withOpacity(isDark ? 0.6 : 0.4),
+                                accentBlend.withOpacity(isDark ? 0.45 : 0.25),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primary.withOpacity(0.2),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                           ),
-                          child:
-                              const Icon(Icons.layers, color: Colors.black),
+                          child: Icon(
+                            Icons.layers,
+                            color: theme.colorScheme.onPrimary,
+                            size: 20,
+                          ),
                         ),
                         onSelected: (mapType) {
                           context
@@ -456,6 +523,7 @@ class HomeBodyWidget extends StatelessWidget {
                           ),
                         ],
                       ),
+                    if (context.read<HomeBloc>().mapType == 'google_map')
                       SizedBox(height: size.width * 0.02),
                     InkWell(
                       onTap: () {
@@ -465,22 +533,34 @@ class HomeBodyWidget extends StatelessWidget {
                             mapType: context.read<HomeBloc>().mapType));
                       },
                       child: Container(
-                        height: size.width * 0.11,
-                        width: size.width * 0.11,
+                        height: size.width * 0.12,
+                        width: size.width * 0.12,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.white,
+                          gradient: LinearGradient(
+                            colors: [
+                              primary.withOpacity(isDark ? 0.95 : 0.9),
+                              accentBlend.withOpacity(isDark ? 0.75 : 0.6),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           border: Border.all(
                             width: 1.2,
-                            color: AppColors.black.withAlpha((0.8 * 255).toInt()),
+                            color: Colors.white.withOpacity(isDark ? 0.25 : 0.7),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primary.withOpacity(0.28),
+                              blurRadius: 22,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
                         ),
-                        child: Center(
-                          child: Icon(
-                            Icons.my_location,
-                            size: size.width * 0.05,
-                            color: AppColors.black,
-                          ),
+                        child: Icon(
+                          Icons.my_location,
+                          size: size.width * 0.05,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -492,99 +572,17 @@ class HomeBodyWidget extends StatelessWidget {
                 bottom: false,
                 top: true,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      NavigationIconWidget(
-                        icon: InkWell(
-                          onTap: () {
-                            if (context.read<HomeBloc>().userData != null) {
-                              Navigator.pushNamed(
-                                      context, AccountPage.routeName,
-                                      arguments: AccountPageArguments(
-                                          userData: context
-                                              .read<HomeBloc>()
-                                              .userData!))
-                                  .then(
-                                (value) {
-                                  if (!context.mounted) return;
-                                  context
-                                      .read<HomeBloc>()
-                                      .add(GetDirectionEvent());
-                                  if (value != null) {
-                                    context.read<HomeBloc>().userData =
-                                        value as UserDetail;
-                                    context.read<HomeBloc>().add(UpdateEvent());
-                                  }
-                                },
-                              );
-                            }
-                          },
-                          child: Icon(Icons.menu,
-                              size: 20,
-                              color: Theme.of(context).primaryColorDark),
-                        ),
-                        isShadowWidget: true,
-                      ),
-                      SizedBox(width: size.width * 0.03),
-                      InkWell(
-                        onTap: () {
-                          if (context
-                                      .read<HomeBloc>()
-                                      .userData!
-                                      .enableModulesForApplications ==
-                                  'both' ||
-                              context
-                                      .read<HomeBloc>()
-                                      .userData!
-                                      .enableModulesForApplications ==
-                                  'taxi') {
-                            context.read<HomeBloc>().add(
-                                DestinationSelectEvent(isPickupChange: true));
-                          } else {
-                            context.read<HomeBloc>().add(
-                                ServiceTypeChangeEvent(serviceTypeIndex: 1));
-                          }
-                        },
-                        child: Container(
-                          width: size.width * 0.78,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(5),
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //       blurRadius: 3,
-                            //       spreadRadius: 2,
-                            //       color: Theme.of(context).shadowColor)
-                            // ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 6),
-                            child: Row(
-                              children: [
-                                const PickupIcon(),
-                                SizedBox(width: size.width * 0.01),
-                                SizedBox(
-                                  width: size.width * 0.63,
-                                  child: MyText(
-                                      text: context
-                                          .read<HomeBloc>()
-                                          .currentLocation,
-                                      textStyle: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                                Icon(Icons.edit_outlined,
-                                    size: 18,
-                                    color: Theme.of(context).disabledColor),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: size.width * 0.02,
+                  ),
+                  child: _buildTopControls(
+                    context,
+                    size,
+                    accentBlend,
+                    glassBackground,
+                    borderColor,
+                    isDark,
                   ),
                 ),
               ),
@@ -631,25 +629,40 @@ class HomeBodyWidget extends StatelessWidget {
                         height:
                             MediaQuery.of(context).size.height * currentSize,
                         curve: Curves.easeInOut,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(30)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Theme.of(context).shadowColor,
-                                blurRadius: 5,
-                                spreadRadius: 1,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: size.width * 0.03,
+                          vertical: size.width * 0.015,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(32)),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: theme.scaffoldBackgroundColor
+                                    .withOpacity(isDark ? 0.92 : 0.94),
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(32)),
+                                border: Border.all(
+                                  color:
+                                      borderColor.withOpacity(isDark ? 0.4 : 0.2),
+                                  width: 0.8,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: accentBlend.withOpacity(0.16),
+                                    blurRadius: 35,
+                                    offset: const Offset(0, -6),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: SingleChildScrollView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            child: context.read<HomeBloc>().serviceAvailable
-                                ? BottomSheetWidget(cont: context)
-                                : Column(
-                                    children: [
+                              child: SingleChildScrollView(
+                                physics: const NeverScrollableScrollPhysics(),
+                                child: context.read<HomeBloc>().serviceAvailable
+                                    ? BottomSheetWidget(cont: context)
+                                    : Column(
+                                        children: [
                                       SizedBox(height: size.width * 0.03),
                                       Image.asset(AppImages.noDataFound,
                                           height: size.width * 0.5,
@@ -660,6 +673,8 @@ class HomeBodyWidget extends StatelessWidget {
                                               .serviceNotAvailable)
                                     ],
                                   ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -671,6 +686,201 @@ class HomeBodyWidget extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildTopControls(
+    BuildContext context,
+    Size size,
+    Color accentBlend,
+    Color glassBackground,
+    Color borderColor,
+    bool isDark,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildMenuButton(context, size, accentBlend, isDark),
+        SizedBox(width: size.width * 0.03),
+        Expanded(
+          child: _buildLocationCard(
+            context,
+            size,
+            accentBlend,
+            glassBackground,
+            borderColor,
+            isDark,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuButton(
+    BuildContext context,
+    Size size,
+    Color accentBlend,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final homeBloc = context.read<HomeBloc>();
+    return GestureDetector(
+      onTap: () {
+        if (homeBloc.userData != null) {
+          Navigator.pushNamed(
+            context,
+            AccountPage.routeName,
+            arguments: AccountPageArguments(userData: homeBloc.userData!),
+          ).then((value) {
+            if (!context.mounted) return;
+            homeBloc.add(GetDirectionEvent());
+            if (value != null) {
+              homeBloc.userData = value as UserDetail;
+              homeBloc.add(UpdateEvent());
+            }
+          });
+        }
+      },
+      child: Container(
+        height: size.width * 0.12,
+        width: size.width * 0.12,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              accentBlend.withOpacity(isDark ? 0.85 : 0.8),
+              theme.colorScheme.primary.withOpacity(isDark ? 0.95 : 0.9),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: accentBlend.withOpacity(0.3),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.menu,
+          size: 22,
+          color: theme.colorScheme.onPrimary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationCard(
+    BuildContext context,
+    Size size,
+    Color accentBlend,
+    Color glassBackground,
+    Color borderColor,
+    bool isDark,
+  ) {
+    final homeBloc = context.read<HomeBloc>();
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: () {
+        if (homeBloc.userData != null) {
+          if (homeBloc.userData!.enableModulesForApplications == 'both' ||
+              homeBloc.userData!.enableModulesForApplications == 'taxi') {
+            homeBloc.add(DestinationSelectEvent(isPickupChange: true));
+          } else {
+            homeBloc.add(ServiceTypeChangeEvent(serviceTypeIndex: 1));
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(28),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: size.width * 0.04,
+              vertical: size.width * 0.035,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              color: glassBackground,
+              border: Border.all(color: borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: accentBlend.withOpacity(0.16),
+                  blurRadius: 30,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: size.width * 0.12,
+                  width: size.width * 0.12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        accentBlend.withOpacity(isDark ? 0.6 : 0.35),
+                        theme.colorScheme.primary
+                            .withOpacity(isDark ? 0.7 : 0.45),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: const PickupIcon(),
+                ),
+                SizedBox(width: size.width * 0.04),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MyText(
+                        text: AppLocalizations.of(context)!.pickupLocation,
+                        textStyle: theme.textTheme.labelSmall?.copyWith(
+                          letterSpacing: 0.3,
+                          fontWeight: FontWeight.w600,
+                          color: accentBlend.withOpacity(isDark ? 0.7 : 0.8),
+                        ),
+                      ),
+                      SizedBox(height: size.width * 0.01),
+                      MyText(
+                        text: homeBloc.currentLocation,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textStyle: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: size.width * 0.02),
+                Container(
+                  height: size.width * 0.1,
+                  width: size.width * 0.1,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accentBlend.withOpacity(isDark ? 0.35 : 0.2),
+                  ),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: accentBlend.withOpacity(isDark ? 0.9 : 0.75),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
