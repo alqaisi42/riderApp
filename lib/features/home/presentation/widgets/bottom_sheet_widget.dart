@@ -1,8 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/common.dart';
-import '../../../../core/utils/custom_divider.dart';
 import '../../../../core/utils/custom_navigation_icon.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -26,34 +27,89 @@ class BottomSheetWidget extends StatelessWidget {
         value: cont.read<HomeBloc>(),
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
+            final theme = Theme.of(context);
+            final colorScheme = theme.colorScheme;
+            final isDark = theme.brightness == Brightness.dark;
+            final baseSurface = theme.scaffoldBackgroundColor;
+            final haloColor = colorScheme.primary.withOpacity(isDark ? 0.25 : 0.12);
+            final cardBorder = theme.dividerColor.withOpacity(isDark ? 0.45 : 0.22);
+            final cardShadow = colorScheme.primary.withOpacity(isDark ? 0.18 : 0.24);
+            final overlayTint = colorScheme.secondary
+                .withOpacity(isDark ? 0.12 : 0.06);
             return Container(
               height: size.height,
               margin: const EdgeInsets.only(top: 1),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
+              child: ClipRRect(
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!context.read<HomeBloc>().isSheetAtTop) ...[
-                    SizedBox(height: size.width * 0.03),
-                    Center(
-                        child: CustomDivider(
-                            height: 5,
-                            width: size.width * 0.2,
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withAlpha((0.4 * 255).toInt()))),
-                    SizedBox(height: size.width * 0.02),
-                  ],
-                  if (context.read<HomeBloc>().isSheetAtTop)
-                    SizedBox(height: size.width * 0.15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: BlocBuilder<HomeBloc, HomeState>(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              baseSurface.withOpacity(isDark ? 0.9 : 0.95),
+                              baseSurface.withOpacity(isDark ? 0.92 : 1),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                        child: Container(
+                          color:
+                              baseSurface.withOpacity(isDark ? 0.78 : 0.82),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              overlayTint,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!context.read<HomeBloc>().isSheetAtTop) ...[
+                          SizedBox(height: size.width * 0.03),
+                          Center(
+                            child: Container(
+                              height: 6,
+                              width: size.width * 0.22,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    haloColor,
+                                    haloColor.withOpacity(isDark ? 0.45 : 0.25),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: size.width * 0.035),
+                        ],
+                        if (context.read<HomeBloc>().isSheetAtTop)
+                          SizedBox(height: size.width * 0.15),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.045),
+                          child: BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) {
                         final homeBloc = context.read<HomeBloc>();
                         if (homeBloc.userData == null) {
@@ -66,17 +122,37 @@ class BottomSheetWidget extends StatelessWidget {
                         double recentSearchWidth = sheetSize == maxSheetSize
                             ? size.width * 0.9
                             : size.width * 0.9;
-                        return Container(
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
                           width: size.width,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(color: cardBorder, width: 1.1),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                theme.colorScheme.surface.withOpacity(
+                                    isDark ? 0.55 : 0.82),
+                                theme.colorScheme.surfaceVariant.withOpacity(
+                                    isDark ? 0.35 : 0.45),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: cardShadow,
+                                blurRadius: 40,
+                                spreadRadius: 4,
+                                offset: const Offset(0, 18),
+                              ),
+                            ],
                           ),
                           child: Padding(
-                            padding: EdgeInsets.only(
-                                right: size.width * 0.0,
-                                left: size.width * 0,
-                                top: size.width * 0.020,
-                                bottom: size.width * 0.020),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.035,
+                              vertical: size.width * 0.04,
+                            ),
                             child: Column(
                               children: [
                                 Row(
@@ -130,11 +206,11 @@ class BottomSheetWidget extends StatelessWidget {
                                       flex: context
                                           .read<HomeBloc>()
                                           .calculateResponsiveFlex(size.width),
-                                      child: InkWell(
-                                        onTap: () {
-                                          final homeBloc = context.read<HomeBloc>();
-                                          if (homeBloc.userData != null) {
-                                            if (homeBloc.userData!.enableModulesForApplications ==
+                                        child: InkWell(
+                                          onTap: () {
+                                            final homeBloc = context.read<HomeBloc>();
+                                            if (homeBloc.userData != null) {
+                                              if (homeBloc.userData!.enableModulesForApplications ==
                                                 'both' ||
                                                 homeBloc.userData!.enableModulesForApplications ==
                                                     'taxi') {
@@ -153,45 +229,62 @@ class BottomSheetWidget extends StatelessWidget {
                                               const Duration(milliseconds: 100),
                                           width: recentSearchWidth,
                                           padding:
-                                              EdgeInsets.all(size.width * 0.02),
+                                              EdgeInsets.all(size.width * 0.022),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
                                             borderRadius:
-                                                BorderRadius.circular(20),
+                                                BorderRadius.circular(22),
                                             border: Border.all(
-                                              color: Theme.of(context)
-                                                  .disabledColor
-                                                  .withAlpha((0.5 * 255).toInt()),
+                                              color: cardBorder,
+                                            ),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                theme.colorScheme.surface
+                                                    .withOpacity(isDark ? 0.6 : 0.85),
+                                                theme.colorScheme.surface
+                                                    .withOpacity(isDark ? 0.4 : 0.65),
+                                              ],
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Theme.of(context)
-                                                    .shadowColor
-                                                    .withAlpha((0.1 * 255).toInt()),
-                                                blurRadius: 15,
-                                                offset: const Offset(0, 1),
-                                                spreadRadius: 1,
+                                                color: cardShadow,
+                                                blurRadius: 22,
+                                                offset: const Offset(0, 10),
                                               ),
                                             ],
                                           ),
                                           child: Row(
                                             children: [
                                               Container(
-                                                width: size.width * 0.075,
-                                                height: size.width * 0.075,
+                                                width: size.width * 0.085,
+                                                height: size.width * 0.085,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Theme.of(context)
-                                                      .disabledColor
-                                                      .withAlpha((0.3 * 255).toInt()),
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: [
+                                                      colorScheme.primary
+                                                          .withOpacity(isDark ? 0.55 : 0.9),
+                                                      colorScheme.secondary
+                                                          .withOpacity(isDark ? 0.5 : 0.7),
+                                                    ],
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: colorScheme.primary
+                                                          .withOpacity(isDark ? 0.35 : 0.25),
+                                                      blurRadius: 18,
+                                                      offset: const Offset(0, 6),
+                                                    ),
+                                                  ],
                                                 ),
                                                 alignment: Alignment.center,
                                                 child: Icon(
                                                   Icons.search,
                                                   size: 20,
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
+                                                  color: colorScheme.onPrimary,
                                                 ),
                                               ),
                                               SizedBox(
@@ -204,11 +297,13 @@ class BottomSheetWidget extends StatelessWidget {
                                                       .whereAreYouGoing,
                                                   textStyle: Theme.of(context)
                                                       .textTheme
-                                                      .bodyMedium!
+                                                      .titleMedium!
                                                       .copyWith(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .primaryColorDark.withAlpha((0.5 * 255).toInt()),
+                                                          color: theme
+                                                              .primaryColorDark
+                                                              .withAlpha((0.75 * 255).toInt()),
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                           fontSize: 16),
                                                 ),
                                               ),
@@ -240,28 +335,31 @@ class BottomSheetWidget extends StatelessWidget {
                                                     }
                                                   },
                                                   child: Container(
-                                                    height: size.width * 0.075,
+                                                    height: size.width * 0.078,
                                                     alignment: Alignment.center,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 5),
-                                                      child: MyText(
-                                                        text:
-                                                            AppLocalizations.of(
-                                                                    context)!
-                                                                .skip,
-                                                        textStyle:
-                                                            Theme.of(context)
-                                                                .textTheme
-                                                                .bodyLarge!
-                                                                .copyWith(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .disabledColor
-                                                                      .withAlpha((0.5 * 255).toInt()),
-                                                                ),
-                                                      ),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            horizontal: 8),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(20),
+                                                      color: theme.disabledColor
+                                                          .withOpacity(isDark ? 0.08 : 0.15),
+                                                    ),
+                                                    child: MyText(
+                                                      text: AppLocalizations.of(
+                                                              context)!
+                                                          .skip,
+                                                      textStyle: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge!
+                                                          .copyWith(
+                                                            color: theme
+                                                                .primaryColorDark
+                                                                .withAlpha(
+                                                                    (0.55 * 255)
+                                                                        .toInt()),
+                                                          ),
                                                     ),
                                                   ),
                                                 ),
@@ -284,7 +382,10 @@ class BottomSheetWidget extends StatelessWidget {
                                         .data
                                         .isNotEmpty) ...[
                                   SizedBox(height: size.width * 0.025),
-                                  BannerWidget(cont: context),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: BannerWidget(cont: context),
+                                  ),
                                 ],
                                 // Service Modules
                                 if (context.read<HomeBloc>().userData != null &&
@@ -312,9 +413,23 @@ class BottomSheetWidget extends StatelessWidget {
                                                 .userData!
                                                 .showRentalRide)))
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5),
-                                    child: ServicesModuleWidget(cont: cont),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: size.width * 0.01),
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(24),
+                                        border: Border.all(color: cardBorder),
+                                        color: theme.colorScheme.surface
+                                            .withOpacity(isDark ? 0.45 : 0.7),
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: size.width * 0.035,
+                                          vertical: size.width * 0.035,
+                                        ),
+                                        child: ServicesModuleWidget(cont: cont),
+                                      ),
+                                    ),
                                   ),
 
                                 // ON GOING RIDES
@@ -365,7 +480,7 @@ class BottomSheetWidget extends StatelessWidget {
                       },
                     ),
                   ),
-                  SizedBox(height: size.width * 0.01),
+                  SizedBox(height: size.width * 0.02),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -382,20 +497,41 @@ class BottomSheetWidget extends StatelessWidget {
                               .data
                               .isNotEmpty) ...[
                         SizedBox(height: size.width * 0.025),
-                        BannerWidget(cont: context),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.045),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: BannerWidget(cont: context),
+                          ),
+                        ),
                       ],
                     ],
                   ),
                   SizedBox(height: size.width * 0.1),
                   Expanded(
-                      child: Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(AppImages.bottomBackground),
-                        fit: BoxFit.cover,
-                      ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          AppImages.bottomBackground,
+                          fit: BoxFit.cover,
+                        ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                baseSurface.withOpacity(isDark ? 0.65 : 0.55),
+                                baseSurface.withOpacity(isDark ? 0.92 : 0.85),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ))
+                  )
                 ],
               ),
             );
