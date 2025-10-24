@@ -22,8 +22,8 @@ class EtaListViewWidget extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    const Color primaryOrange = Color(0xFFFF6A00);
-    const Color secondaryOrange = Color(0xFFFFA000);
+    const Color primaryOrange = Color(0xFFF0AF49);
+    const Color secondaryOrange = Color(0xFFE8B25F);
 
     return BlocProvider.value(
       value: cont.read<BookingBloc>(),

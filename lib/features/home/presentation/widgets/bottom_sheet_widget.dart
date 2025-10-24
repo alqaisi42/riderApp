@@ -48,8 +48,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
     final bgColor = isDark ? const Color(0xFF1A1A1A) : Colors.white;
 
     // Define new orange palette
-    const Color primaryOrange = Color(0xFFFF6A00);
-    const Color secondaryOrange = Color(0xFFFFA000);
+    const Color primaryOrange = Color(0xFFF0AF49);
+    const Color secondaryOrange = Color(0xFFE8B25F);
 
     return BlocProvider.value(
       value: homeBloc,
