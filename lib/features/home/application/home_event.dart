@@ -17,8 +17,8 @@ class GetLocationPermissionEvent extends HomeEvent {
 
   GetLocationPermissionEvent(
       {this.controller,
-      required this.isFromHomePage,
-      required this.isEditAddress});
+        required this.isFromHomePage,
+        required this.isEditAddress});
 }
 
 class ServiceTypeChangeEvent extends HomeEvent {
@@ -31,11 +31,24 @@ class DestinationSelectEvent extends HomeEvent {
   final bool isPickupChange;
   final String? dropAddress;
   final LatLng? dropLatLng;
+  final String? prefilledAddress;
 
   DestinationSelectEvent({
     required this.isPickupChange,
     this.dropAddress,
     this.dropLatLng,
+    this.prefilledAddress,
+  });
+}
+
+// FIXED: Made latLng and mapType nullable
+class UpdateCurrentLocationEvent extends HomeEvent {
+  final LatLng? latLng;
+  final String? mapType;
+
+  UpdateCurrentLocationEvent({
+    this.latLng,
+    this.mapType,
   });
 }
 
@@ -46,8 +59,8 @@ class UpdateLocationEvent extends HomeEvent {
 
   UpdateLocationEvent(
       {required this.latLng,
-      required this.isFromHomePage,
-      required this.mapType});
+        required this.isFromHomePage,
+        required this.mapType});
 }
 
 // class UpdateMarkerEvent extends HomeEvent {
@@ -113,8 +126,8 @@ class RecentSearchPlaceSelectEvent extends HomeEvent {
 
   RecentSearchPlaceSelectEvent(
       {required this.address,
-      required this.isPickupSelect,
-      required this.transportType});
+        required this.isPickupSelect,
+        required this.transportType});
 }
 
 class FavLocationSelectEvent extends HomeEvent {
@@ -197,8 +210,8 @@ class ReceiverContactEvent extends HomeEvent {
 
   ReceiverContactEvent(
       {required this.name,
-      required this.number,
-      required this.isReceiveMyself});
+        required this.number,
+        required this.isReceiveMyself});
 }
 
 class SelectContactDetailsEvent extends HomeEvent {}

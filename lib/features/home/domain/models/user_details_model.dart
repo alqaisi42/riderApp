@@ -72,6 +72,8 @@ class UserDetail {
   String showOutstationRideFeature;
   String showTaxiOutstationRideFeature;
   String showDeliveryOutstationRideFeature;
+  String workAddress;
+  String homeAddress;
   SOS sos;
   dynamic bannerImage;
   Wallet wallet;
@@ -94,6 +96,8 @@ class UserDetail {
       required this.name,
       required this.gender,
       required this.lastName,
+      required this.workAddress,
+      required this.homeAddress,
       required this.username,
       required this.email,
       required this.mobile,
@@ -239,7 +243,7 @@ class UserDetail {
       enableMapAppearanceChange: json['enable_map_appearance_change_on_mobile_app'].toString(),
       androidApp: json["android_app"] ?? '',
       iosApp: json["ios_app"] ?? '',
-      enableOutstationRoundTripFeature: json["enable_outstation_round_trip_feature"] ?? "0");
+      enableOutstationRoundTripFeature: json["enable_outstation_round_trip_feature"] ?? "0", workAddress: '', homeAddress: '');
 }
 
 class SOS {

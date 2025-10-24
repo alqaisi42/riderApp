@@ -136,6 +136,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UpdateEvent>((event, emit) => emit(HomeUpdateState()));
     on<GetDirectionEvent>(getDirection);
     // HomePage
+    on<UpdateCurrentLocationEvent>(updateCurrentLocation);
+
     on<GetUserDetailsEvent>(getUserDetails);
     on<GoogleControllAssignEvent>(assignController);
     on<GetLocationPermissionEvent>(getLocationPermission);
@@ -217,6 +219,41 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+  Future<void> updateCurrentLocation(
+      UpdateCurrentLocationEvent event, Emitter<HomeState> emit) async {
+
+    // Handle nullable latLng - use provided value or fallback to currentLatLng
+    final LatLng targetLatLng = event.latLng ?? currentLatLng;
+
+    // Validate coordinates - don't proceed if invalid
+    if (targetLatLng.latitude == 0 && targetLatLng.longitude == 0) {
+      debugPrint('UpdateCurrentLocation: Invalid coordinates provided');
+      return;
+    }
+
+    // Update current location
+    currentLatLng = targetLatLng;
+    isOnCurrentLocation = true;
+
+    // Handle nullable mapType - use provided value or fallback to stored mapType
+    final String activeMapType = (event.mapType?.isNotEmpty == true)
+        ? event.mapType!
+        : mapType;
+
+    // Animate camera based on map type
+    if (activeMapType == 'google_map') {
+      googleMapController?.animateCamera(
+        CameraUpdate.newLatLng(targetLatLng),
+      );
+    } else {
+      fmController?.move(
+        fmlt.LatLng(targetLatLng.latitude, targetLatLng.longitude),
+        fmController!.camera.zoom,
+      );
+    }
+
+    emit(HomeUpdateState());
+  }
   // ===========================VECHILE MARKER ADD======================================>
 
   nearByVechileCheckStream(BuildContext context, dynamic vsync) async {

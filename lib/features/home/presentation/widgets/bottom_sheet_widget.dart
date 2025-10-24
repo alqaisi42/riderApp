@@ -1,13 +1,9 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../common/common.dart';
-import '../../../../core/utils/custom_navigation_icon.dart';
-import '../../../../core/utils/custom_text.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../account/presentation/pages/account_page.dart';
 import '../../application/home_bloc.dart';
 import '../../domain/models/user_details_model.dart';
 import 'banner_widget.dart';
@@ -15,527 +11,487 @@ import 'home_on_going_rides.dart';
 import 'recent_search_places_widget.dart';
 import 'services_module_widget.dart';
 
-class BottomSheetWidget extends StatelessWidget {
+class BottomSheetWidget extends StatefulWidget {
   final BuildContext cont;
 
   const BottomSheetWidget({super.key, required this.cont});
 
   @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    return BlocProvider.value(
-        value: cont.read<HomeBloc>(),
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            final theme = Theme.of(context);
-            final colorScheme = theme.colorScheme;
-            final isDark = theme.brightness == Brightness.dark;
-            final baseSurface = theme.scaffoldBackgroundColor;
-            final haloColor = colorScheme.primary.withOpacity(isDark ? 0.25 : 0.12);
-            final cardBorder = theme.dividerColor.withOpacity(isDark ? 0.45 : 0.22);
-            final cardShadow = colorScheme.primary.withOpacity(isDark ? 0.18 : 0.24);
-            final overlayTint = colorScheme.secondary
-                .withOpacity(isDark ? 0.12 : 0.06);
-            return Container(
-              height: size.height,
-              margin: const EdgeInsets.only(top: 1),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30)),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              baseSurface.withOpacity(isDark ? 0.9 : 0.95),
-                              baseSurface.withOpacity(isDark ? 0.92 : 1),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          color:
-                              baseSurface.withOpacity(isDark ? 0.78 : 0.82),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              overlayTint,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (!context.read<HomeBloc>().isSheetAtTop) ...[
-                          SizedBox(height: size.width * 0.03),
-                          Center(
-                            child: Container(
-                              height: 6,
-                              width: size.width * 0.22,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    haloColor,
-                                    haloColor.withOpacity(isDark ? 0.45 : 0.25),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: size.width * 0.035),
-                        ],
-                        if (context.read<HomeBloc>().isSheetAtTop)
-                          SizedBox(height: size.width * 0.15),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: size.width * 0.045),
-                          child: BlocBuilder<HomeBloc, HomeState>(
-                      builder: (context, state) {
-                        final homeBloc = context.read<HomeBloc>();
-                        if (homeBloc.userData == null) {
-                          return const SizedBox.shrink(); // Or a loading indicator
-                        }
-                        // Access the current sheetSize directly from HomeBloc
-                        double sheetSize = context.read<HomeBloc>().sheetSize;
-                        double maxSheetSize =
-                            context.read<HomeBloc>().maxChildSize;
-                        double recentSearchWidth = sheetSize == maxSheetSize
-                            ? size.width * 0.9
-                            : size.width * 0.9;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeInOut,
-                          width: size.width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(26),
-                            border: Border.all(color: cardBorder, width: 1.1),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.colorScheme.surface.withOpacity(
-                                    isDark ? 0.55 : 0.82),
-                                theme.colorScheme.surfaceVariant.withOpacity(
-                                    isDark ? 0.35 : 0.45),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: cardShadow,
-                                blurRadius: 40,
-                                spreadRadius: 4,
-                                offset: const Offset(0, 18),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: size.width * 0.035,
-                              vertical: size.width * 0.04,
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(width: size.width * 0.02),
-                                    if (context.read<HomeBloc>().isSheetAtTop ==
-                                            true &&
-                                        context.read<HomeBloc>().userData !=
-                                            null)
-                                      Flexible(
-                                        child: NavigationIconWidget(
-                                          icon: InkWell(
-                                            onTap: () {
-                                              Navigator.pushNamed(context,
-                                                      AccountPage.routeName,
-                                                      arguments:
-                                                          AccountPageArguments(
-                                                              userData: context
-                                                                  .read<
-                                                                      HomeBloc>()
-                                                                  .userData!))
-                                                  .then((value) {
-                                                if (!context.mounted) return;
-                                                context
-                                                    .read<HomeBloc>()
-                                                    .add(GetDirectionEvent());
-                                                if (value != null) {
-                                                  context
-                                                          .read<HomeBloc>()
-                                                          .userData =
-                                                      value as UserDetail;
-                                                  context
-                                                      .read<HomeBloc>()
-                                                      .add(UpdateEvent());
-                                                }
-                                              });
-                                            },
-                                            child: Icon(
-                                              Icons.menu,
-                                              size: 20,
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                            ),
-                                          ),
-                                          isShadowWidget: true,
-                                        ),
-                                      ),
-                                    if (context.read<HomeBloc>().isSheetAtTop)
-                                      SizedBox(width: size.width * 0.02),
-                                    Flexible(
-                                      flex: context
-                                          .read<HomeBloc>()
-                                          .calculateResponsiveFlex(size.width),
-                                        child: InkWell(
-                                          onTap: () {
-                                            final homeBloc = context.read<HomeBloc>();
-                                            if (homeBloc.userData != null) {
-                                              if (homeBloc.userData!.enableModulesForApplications ==
-                                                'both' ||
-                                                homeBloc.userData!.enableModulesForApplications ==
-                                                    'taxi') {
-                                              homeBloc.add(DestinationSelectEvent(
-                                                  isPickupChange: false));
-                                            } else {
-                                              homeBloc.add(ServiceTypeChangeEvent(
-                                                  serviceTypeIndex: 1));
-                                            }
-                                          }
-                                        },
-                                        child: AnimatedContainer(
-                                          transformAlignment:
-                                              Alignment.centerRight,
-                                          duration:
-                                              const Duration(milliseconds: 100),
-                                          width: recentSearchWidth,
-                                          padding:
-                                              EdgeInsets.all(size.width * 0.022),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(22),
-                                            border: Border.all(
-                                              color: cardBorder,
-                                            ),
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                theme.colorScheme.surface
-                                                    .withOpacity(isDark ? 0.6 : 0.85),
-                                                theme.colorScheme.surface
-                                                    .withOpacity(isDark ? 0.4 : 0.65),
-                                              ],
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: cardShadow,
-                                                blurRadius: 22,
-                                                offset: const Offset(0, 10),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: size.width * 0.085,
-                                                height: size.width * 0.085,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                    colors: [
-                                                      colorScheme.primary
-                                                          .withOpacity(isDark ? 0.55 : 0.9),
-                                                      colorScheme.secondary
-                                                          .withOpacity(isDark ? 0.5 : 0.7),
-                                                    ],
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: colorScheme.primary
-                                                          .withOpacity(isDark ? 0.35 : 0.25),
-                                                      blurRadius: 18,
-                                                      offset: const Offset(0, 6),
-                                                    ),
-                                                  ],
-                                                ),
-                                                alignment: Alignment.center,
-                                                child: Icon(
-                                                  Icons.search,
-                                                  size: 20,
-                                                  color: colorScheme.onPrimary,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                  width: size.width * 0.02),
-                                              Expanded(
-                                                // Place Expanded inside Row to prevent overflow here
-                                                child: MyText(
-                                                  text: AppLocalizations.of(
-                                                          context)!
-                                                      .whereAreYouGoing,
-                                                  textStyle: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                          color: theme
-                                                              .primaryColorDark
-                                                              .withAlpha((0.75 * 255).toInt()),
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 16),
-                                                ),
-                                              ),
-                                              if (context
-                                                          .read<HomeBloc>()
-                                                          .userData !=
-                                                      null &&
-                                                  (context
-                                                          .read<HomeBloc>()
-                                                          .userData!
-                                                          .showRideWithoutDestination ==
-                                                      "1") &&
-                                                  (context
-                                                              .read<HomeBloc>()
-                                                              .userData!
-                                                              .enableModulesForApplications ==
-                                                          'taxi' ||
-                                                      context
-                                                              .read<HomeBloc>()
-                                                              .userData!
-                                                              .enableModulesForApplications ==
-                                                          'both'))
-                                                InkWell(
-                                                  onTap: () {
-                                                    final homeBloc = context.read<HomeBloc>();
-                                                    if (homeBloc.userData != null) {
-                                                      homeBloc.add(
-                                                          RideWithoutDestinationEvent());
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    height: size.width * 0.078,
-                                                    alignment: Alignment.center,
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            horizontal: 8),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(20),
-                                                      color: theme.disabledColor
-                                                          .withOpacity(isDark ? 0.08 : 0.15),
-                                                    ),
-                                                    child: MyText(
-                                                      text: AppLocalizations.of(
-                                                              context)!
-                                                          .skip,
-                                                      textStyle: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge!
-                                                          .copyWith(
-                                                            color: theme
-                                                                .primaryColorDark
-                                                                .withAlpha(
-                                                                    (0.55 * 255)
-                                                                        .toInt()),
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // Banner
-                                if (context.read<HomeBloc>().isSheetAtTop ==
-                                        false &&
-                                    context.read<HomeBloc>().userData != null &&
-                                    homeBloc.userData!.bannerImage != null &&
-                                    context
-                                        .read<HomeBloc>()
-                                        .userData!
-                                        .bannerImage
-                                        .data
-                                        .isNotEmpty) ...[
-                                  SizedBox(height: size.width * 0.025),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: BannerWidget(cont: context),
-                                  ),
-                                ],
-                                // Service Modules
-                                if (context.read<HomeBloc>().userData != null &&
-                                    ((context
-                                                .read<HomeBloc>()
-                                                .userData!
-                                                .enableModulesForApplications ==
-                                            'both') ||
-                                        (context
-                                                    .read<HomeBloc>()
-                                                    .userData!
-                                                    .enableModulesForApplications ==
-                                                'taxi' &&
-                                            context
-                                                .read<HomeBloc>()
-                                                .userData!
-                                                .showRentalRide) ||
-                                        (context
-                                                    .read<HomeBloc>()
-                                                    .userData!
-                                                    .enableModulesForApplications ==
-                                                'delivery' &&
-                                            context
-                                                .read<HomeBloc>()
-                                                .userData!
-                                                .showRentalRide)))
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: size.width * 0.01),
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(24),
-                                        border: Border.all(color: cardBorder),
-                                        color: theme.colorScheme.surface
-                                            .withOpacity(isDark ? 0.45 : 0.7),
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: size.width * 0.035,
-                                          vertical: size.width * 0.035,
-                                        ),
-                                        child: ServicesModuleWidget(cont: cont),
-                                      ),
-                                    ),
-                                  ),
+  State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
+}
 
-                                // ON GOING RIDES
-                                if (context
-                                    .read<HomeBloc>()
-                                    .isMultipleRide) ...[
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        MyText(
-                                            text: AppLocalizations.of(context)!
-                                                .onGoingRides,
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium!
-                                                .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColorDark)),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: size.width * 0.01),
-                                  HomeOnGoingRidesWidget(cont: context),
-                                ],
-                                // Recent search places
-                                if (context
-                                    .read<HomeBloc>()
-                                    .recentSearchPlaces
-                                    .isNotEmpty) ...[
-                                  SizedBox(
-                                      height: context
-                                                  .read<HomeBloc>()
-                                                  .isSheetAtTop ==
-                                              false
-                                          ? size.width * 0.01
-                                          : size.width * 0.02),
-                                  RecentSearchPlacesWidget(cont: context)
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+class _BottomSheetWidgetState extends State<BottomSheetWidget>
+    with TickerProviderStateMixin {
+  late AnimationController _shimmerController;
+  bool _showPromoHeader = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final homeBloc = widget.cont.read<HomeBloc>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1A1A1A) : Colors.white;
+
+    // Define new orange palette
+    const Color primaryOrange = Color(0xFFFF6A00);
+    const Color secondaryOrange = Color(0xFFFFA000);
+
+    return BlocProvider.value(
+      value: homeBloc,
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          return DraggableScrollableSheet(
+            minChildSize: 0.25,
+            maxChildSize: 0.95,
+            initialChildSize: 0.45,
+            expand: false,
+            snap: true,
+            builder: (context, scrollController) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
+                      blurRadius: 25,
+                      offset: const Offset(0, -4),
                     ),
-                  ),
-                  SizedBox(height: size.width * 0.02),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (context.read<HomeBloc>().isSheetAtTop == true &&
-                          context.read<HomeBloc>().userData != null &&
-                          context
-                              .read<HomeBloc>()
-                              .userData!
-                              .bannerImage != null &&
-                          context
-                              .read<HomeBloc>()
-                              .userData!
-                              .bannerImage
-                              .data
-                              .isNotEmpty) ...[
-                        SizedBox(height: size.width * 0.025),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: size.width * 0.045),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: BannerWidget(cont: context),
-                          ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  child: CustomScrollView(
+                    controller: scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Column(
+                          children: [
+                            _buildDragHandle(),
+                            if (homeBloc.userData == null)
+                              _buildShimmerLoading(context, isDark)
+                            else
+                              _buildSheetContent(
+                                  context, theme, isDark, homeBloc, primaryOrange, secondaryOrange),
+                          ],
                         ),
-                      ],
+                      ),
                     ],
                   ),
-                  SizedBox(height: size.width * 0.1),
-                  Expanded(
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          AppImages.bottomBackground,
-                          fit: BoxFit.cover,
-                        ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                baseSurface.withOpacity(isDark ? 0.65 : 0.55),
-                                baseSurface.withOpacity(isDark ? 0.92 : 0.85),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDragHandle() => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: Center(
+      child: Container(
+        height: 5,
+        width: 50,
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(2.5),
+        ),
+      ),
+    ),
+  );
+
+  Widget _buildSheetContent(
+      BuildContext context,
+      ThemeData theme,
+      bool isDark,
+      HomeBloc bloc,
+      Color primary,
+      Color secondary) {
+    final size = MediaQuery.of(context).size;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_showPromoHeader) _buildPromoHeader(context, size, isDark, primary, secondary),
+          const SizedBox(height: 10),
+          _buildEnhancedDestinationSection(context, size, isDark, primary),
+          const SizedBox(height: 16),
+          _buildQuickAccessLocations(context, size, isDark, primary),
+          const SizedBox(height: 20),
+          if (bloc.userData?.bannerImage?.data.isNotEmpty ?? false)
+            _buildBanner(context, size),
+          const SizedBox(height: 24),
+          if (_shouldShowServiceModules(bloc))
+            _buildServiceModulesSection(context, size, isDark, primary),
+          const SizedBox(height: 24),
+          if (bloc.isMultipleRide)
+            _buildOngoingRides(context, size, isDark, primary),
+          const SizedBox(height: 24),
+          if (bloc.recentSearchPlaces.isNotEmpty)
+            _buildRecentPlacesSection(context, size, isDark, primary),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromoHeader(BuildContext context, Size size, bool isDark,
+      Color primary, Color secondary) {
+    return AnimatedOpacity(
+      opacity: _showPromoHeader ? 1 : 0,
+      duration: const Duration(milliseconds: 300),
+      child: Container(
+        margin: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [primary, secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Enhance your pick-up experience\nGet a faster, hassle-free ride',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                setState(() => _showPromoHeader = false);
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedDestinationSection(
+      BuildContext context, Size size, bool isDark, Color primary) {
+    final bloc = context.read<HomeBloc>();
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        if (bloc.userData != null) {
+          bloc.add(DestinationSelectEvent(isPickupChange: false));
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF222222) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: primary.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.location_on, color: primary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.whereAreYouGoing ??
+                    "Where are you going?",
+                style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            Icon(Icons.calendar_today_outlined, size: 18, color: primary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessLocations(
+      BuildContext context, Size size, bool isDark, Color primary) {
+    final bloc = context.read<HomeBloc>();
+    final saved = _getSavedLocations(bloc);
+    if (saved.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Saved Places",
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87),
+        ),
+        const SizedBox(height: 10),
+        ...saved.map((loc) => _buildQuickAccessItem(
+          loc['icon'],
+          loc['title'],
+          loc['address'],
+          loc['onTap'],
+          isDark,
+          primary,
+        )),
+      ],
+    );
+  }
+
+  Widget _buildQuickAccessItem(IconData icon, String title, String address,
+      VoidCallback onTap, bool isDark, Color primary) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.withOpacity(0.15)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: primary.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: primary, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
+                    Text(address,
+                        style:
+                        TextStyle(color: Colors.grey[600], fontSize: 13),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ]),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBanner(BuildContext context, Size size) => ClipRRect(
+    borderRadius: BorderRadius.circular(16),
+    child: BannerWidget(cont: context),
+  );
+
+  Widget _buildServiceModulesSection(
+      BuildContext context, Size size, bool isDark, Color primary) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Services",
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF8F9FA),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ServicesModuleWidget(cont: widget.cont),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOngoingRides(
+      BuildContext context, Size size, bool isDark, Color primary) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.onGoingRides,
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87),
+        ),
+        const SizedBox(height: 10),
+        HomeOnGoingRidesWidget(cont: context),
+      ],
+    );
+  }
+
+  Widget _buildRecentPlacesSection(
+      BuildContext context, Size size, bool isDark, Color primary) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Recent Places",
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87),
+        ),
+        const SizedBox(height: 10),
+        RecentSearchPlacesWidget(cont: context),
+      ],
+    );
+  }
+
+  Widget _buildShimmerLoading(BuildContext context, bool isDark) {
+    final size = MediaQuery.of(context).size;
+    return Column(
+      children: [
+        _ShimmerBox(width: size.width * 0.9, height: 140, isDark: isDark),
+        const SizedBox(height: 10),
+        _ShimmerBox(width: size.width * 0.9, height: 100, isDark: isDark),
+      ],
+    );
+  }
+
+  bool _shouldShowServiceModules(HomeBloc bloc) {
+    final u = bloc.userData;
+    if (u == null) return false;
+    return (u.enableModulesForApplications == 'both') ||
+        (u.enableModulesForApplications == 'taxi' && u.showRentalRide);
+  }
+
+  List<Map<String, dynamic>> _getSavedLocations(HomeBloc bloc) {
+    final locations = <Map<String, dynamic>>[];
+    if (bloc.userData?.workAddress?.isNotEmpty ?? false) {
+      locations.add({
+        'icon': Icons.work_rounded,
+        'title': 'Work',
+        'address': bloc.userData!.workAddress!,
+        'onTap': () {
+          bloc.add(DestinationSelectEvent(
+              isPickupChange: false,
+              prefilledAddress: bloc.userData!.workAddress));
+        },
+      });
+    }
+    if (bloc.userData?.homeAddress?.isNotEmpty ?? false) {
+      locations.add({
+        'icon': Icons.home_rounded,
+        'title': 'Home',
+        'address': bloc.userData!.homeAddress!,
+        'onTap': () {
+          bloc.add(DestinationSelectEvent(
+              isPickupChange: false,
+              prefilledAddress: bloc.userData!.homeAddress));
+        },
+      });
+    }
+    return locations;
+  }
+}
+
+class _ShimmerBox extends StatefulWidget {
+  final double width, height;
+  final bool isDark;
+
+  const _ShimmerBox(
+      {required this.width, required this.height, required this.isDark});
+
+  @override
+  State<_ShimmerBox> createState() => _ShimmerBoxState();
+}
+
+class _ShimmerBoxState extends State<_ShimmerBox>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+    AnimationController(vsync: this, duration: const Duration(seconds: 2))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return Container(
+            width: widget.width,
+            height: widget.height,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment(-1 + 2 * _controller.value, 0),
+                end: Alignment(1 + 2 * _controller.value, 0),
+                colors: widget.isDark
+                    ? [
+                  const Color(0xFF2A2A2A),
+                  const Color(0xFF3A3A3A),
+                  const Color(0xFF2A2A2A)
+                ]
+                    : [
+                  const Color(0xFFFFF1E0),
+                  const Color(0xFFFFE0B2),
+                  const Color(0xFFFFF1E0)
                 ],
               ),
-            );
-          },
-        ));
+            ),
+          );
+        });
   }
 }
