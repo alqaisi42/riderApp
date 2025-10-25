@@ -32,6 +32,13 @@ class DestinationPage extends StatefulWidget {
 }
 
 class _DestinationPageState extends State<DestinationPage> {
+  static const Color _primaryOrange = Color(0xFFF0AF49);
+  static const Color _secondaryOrange = Color(0xFFE8B25F);
+  static const LinearGradient _brandGradient = LinearGradient(
+    colors: [_primaryOrange, _secondaryOrange],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -334,7 +341,13 @@ class _DestinationPageState extends State<DestinationPage> {
                   child: Scaffold(
                     appBar: AppBar(
                       automaticallyImplyLeading: false,
-                      backgroundColor: AppColors.secondary,
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      flexibleSpace: Container(
+                        decoration: const BoxDecoration(
+                          gradient: _brandGradient,
+                        ),
+                      ),
                       leading: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 3),
@@ -358,23 +371,40 @@ class _DestinationPageState extends State<DestinationPage> {
                                         .read<HomeBloc>()
                                         .add(AddStopEvent());
                                   },
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.add,
-                                        color: AppColors.white,
-                                        size: 20,
-                                      ),
-                                      MyText(
-                                          text: AppLocalizations.of(context)!
-                                              .addStop,
-                                          textStyle: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium!
-                                              .copyWith(
-                                                  color: AppColors.white,
-                                                  fontWeight: FontWeight.w600)),
-                                    ],
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      gradient: _brandGradient,
+                                      borderRadius: BorderRadius.circular(24),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.08),
+                                          offset: const Offset(0, 4),
+                                          blurRadius: 12,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.add,
+                                          color: AppColors.white,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        MyText(
+                                            text: AppLocalizations.of(context)!
+                                                .addStop,
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium!
+                                                .copyWith(
+                                                    color: AppColors.white,
+                                                    fontWeight: FontWeight.w600)),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
@@ -600,22 +630,29 @@ class _DestinationPageState extends State<DestinationPage> {
   Widget buildLocationSelect(BuildContext context, Size size,HomeBloc homeBloc) {
     return Container(
       decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          gradient: _brandGradient,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           boxShadow: [
             BoxShadow(
                 color: Theme.of(context).shadowColor,
                 offset: const Offset(0, 5),
-                blurRadius: 5,
+                blurRadius: 12,
                 spreadRadius: 1)
           ]),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (homeBloc.addressList.isNotEmpty) ...[
-              Theme(
-                data: Theme.of(context).copyWith(
+      child: Container(
+        margin: const EdgeInsets.all(1.2),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (homeBloc.addressList.isNotEmpty) ...[
+                Theme(
+                  data: Theme.of(context).copyWith(
                   canvasColor: Colors.white,
                   shadowColor: Colors.transparent,
                 ),
@@ -942,35 +979,47 @@ class _DestinationPageState extends State<DestinationPage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context)
-                              .disabledColor
-                              .withAlpha((0.1 * 255).toInt()),
+                          gradient: _brandGradient,
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                            ),
+                          ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 5),
-                          child: Row(
-                            children: [
-                              Icon(
-                                (location.addressName.toLowerCase() == 'home')
-                                    ? Icons.home_outlined
-                                    : (location.addressName.toLowerCase() ==
-                                            'work')
-                                        ? Icons.business_center_outlined
-                                        : Icons.home_work_outlined,
-                                size: 18,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              const SizedBox(width: 5),
-                              MyText(
-                                text: location.addressName,
-                                textStyle: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              )
-                            ],
+                        child: Container(
+                          margin: const EdgeInsets.all(1.2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  (location.addressName.toLowerCase() == 'home')
+                                      ? Icons.home_outlined
+                                      : (location.addressName.toLowerCase() ==
+                                              'work')
+                                          ? Icons.business_center_outlined
+                                          : Icons.home_work_outlined,
+                                  size: 18,
+                                  color: _primaryOrange,
+                                ),
+                                const SizedBox(width: 5),
+                                MyText(
+                                  text: location.addressName,
+                                  textStyle: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -984,29 +1033,40 @@ class _DestinationPageState extends State<DestinationPage> {
                 if (!isHomeAvailable)
                   Padding(
                     padding: EdgeInsets.only(right: size.width * 0.02),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(
-                                context, FavoriteLocationPage.routeName,
-                                arguments: FavouriteLocationPageArguments(
-                                    userData: widget.arg.userData))
-                            .then(
-                          (value) {
-                            if (!context.mounted) return;
-                            if (value != null) {
-                              homeBloc.userData =
-                                  value as UserDetail;
-                              homeBloc.add(UpdateEvent());
-                            }
-                          },
-                        );
-                      },
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                              context, FavoriteLocationPage.routeName,
+                              arguments: FavouriteLocationPageArguments(
+                                  userData: widget.arg.userData))
+                          .then(
+                        (value) {
+                          if (!context.mounted) return;
+                          if (value != null) {
+                            homeBloc.userData =
+                                value as UserDetail;
+                            homeBloc.add(UpdateEvent());
+                          }
+                        },
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: _brandGradient,
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            offset: const Offset(0, 3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
                       child: Container(
+                        margin: const EdgeInsets.all(1.2),
                         decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context)
-                              .disabledColor
-                              .withAlpha((0.1 * 255).toInt()),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -1016,9 +1076,7 @@ class _DestinationPageState extends State<DestinationPage> {
                               Icon(
                                 Icons.add_circle_outline,
                                 size: 18,
-                                color: Theme.of(context)
-                                    .disabledColor
-                                    .withAlpha((0.5 * 255).toInt()),
+                                color: _primaryOrange,
                               ),
                               const SizedBox(width: 5),
                               MyText(
@@ -1034,32 +1092,44 @@ class _DestinationPageState extends State<DestinationPage> {
                       ),
                     ),
                   ),
+                ),
                 if (!isWorkAvailable)
                   Padding(
                     padding: EdgeInsets.only(right: size.width * 0.02),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(
-                                context, FavoriteLocationPage.routeName,
-                                arguments: FavouriteLocationPageArguments(
-                                    userData: widget.arg.userData))
-                            .then(
-                          (value) {
-                            if (!context.mounted) return;
-                            if (value != null) {
-                              homeBloc.userData =
-                                  value as UserDetail;
-                              homeBloc.add(UpdateEvent());
-                            }
-                          },
-                        );
-                      },
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                              context, FavoriteLocationPage.routeName,
+                              arguments: FavouriteLocationPageArguments(
+                                  userData: widget.arg.userData))
+                          .then(
+                        (value) {
+                          if (!context.mounted) return;
+                          if (value != null) {
+                            homeBloc.userData =
+                                value as UserDetail;
+                            homeBloc.add(UpdateEvent());
+                          }
+                        },
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: _brandGradient,
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            offset: const Offset(0, 3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
                       child: Container(
+                        margin: const EdgeInsets.all(1.2),
                         decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context)
-                              .disabledColor
-                              .withAlpha((0.1 * 255).toInt()),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -1069,9 +1139,7 @@ class _DestinationPageState extends State<DestinationPage> {
                               Icon(
                                 Icons.add_circle_outline,
                                 size: 18,
-                                color: Theme.of(context)
-                                    .disabledColor
-                                    .withAlpha((0.5 * 255).toInt()),
+                                color: _primaryOrange,
                               ),
                               const SizedBox(width: 5),
                               MyText(
@@ -1087,6 +1155,7 @@ class _DestinationPageState extends State<DestinationPage> {
                       ),
                     ),
                   ),
+                ),
                 if (!isOthersAvailable)
                   Padding(
                     padding: EdgeInsets.only(right: size.width * 0.02),
@@ -1109,32 +1178,42 @@ class _DestinationPageState extends State<DestinationPage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context)
-                              .disabledColor
-                              .withAlpha((0.1 * 255).toInt()),
+                          gradient: _brandGradient,
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                            ),
+                          ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 5),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline,
-                                size: 18,
-                                color: Theme.of(context)
-                                    .disabledColor
-                                    .withAlpha((0.5 * 255).toInt()),
-                              ),
-                              const SizedBox(width: 5),
-                              MyText(
-                                text: AppLocalizations.of(context)!.others,
-                                textStyle: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              )
-                            ],
+                        child: Container(
+                          margin: const EdgeInsets.all(1.2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.add_circle_outline,
+                                  size: 18,
+                                  color: _primaryOrange,
+                                ),
+                                const SizedBox(width: 5),
+                                MyText(
+                                  text: AppLocalizations.of(context)!.others,
+                                  textStyle: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -1192,130 +1271,140 @@ class _DestinationPageState extends State<DestinationPage> {
                           child: Container(
                             margin: const EdgeInsets.only(right: 5),
                             decoration: BoxDecoration(
-                              border: Border.all(),
-                              color: Theme.of(context)
-                                  .disabledColor
-                                  .withAlpha((0.1 * 255).toInt()),
-                              borderRadius: BorderRadius.circular(10),
+                              gradient: _brandGradient,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  offset: const Offset(0, 4),
+                                  blurRadius: 10,
+                                ),
+                              ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: size.width * 0.018),
-                                        child: const PickupIcon(),
-                                      ),
-                                      Expanded(
-                                        child: MyText(
-                                          text: route.pickShortAddress,
-                                          textStyle: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .copyWith(fontSize: 13),
+                            child: Container(
+                              margin: const EdgeInsets.all(1.4),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).scaffoldBackgroundColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: size.width * 0.018),
+                                          child: const PickupIcon(),
                                         ),
+                                        Expanded(
+                                          child: MyText(
+                                            text: route.pickShortAddress,
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(fontSize: 13),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (route.searchStops.data.isNotEmpty) ...[
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16),
+                                        child: VerticalDotDividerWidget(),
+                                      ),
+                                      ListView.separated(
+                                        itemCount: route.searchStops.data.length,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, ind) {
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        size.width * 0.023),
+                                                child: Container(
+                                                  height: 16,
+                                                  width: 16,
+                                                  decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    gradient: _brandGradient,
+                                                  ),
+                                                  child: Center(
+                                                    child: MyText(
+                                                      text: '${ind + 1}',
+                                                      textStyle: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall!
+                                                          .copyWith(
+                                                              color: AppColors
+                                                                  .white),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: MyText(
+                                                  text: route.searchStops
+                                                      .data[ind].shortAddress,
+                                                  textStyle: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(fontSize: 13),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                        separatorBuilder: (context, index) {
+                                          return const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16),
+                                                child: VerticalDotDividerWidget(),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       ),
                                     ],
-                                  ),
-                                  if (route.searchStops.data.isNotEmpty) ...[
                                     const Padding(
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 16),
                                       child: VerticalDotDividerWidget(),
                                     ),
-                                    ListView.separated(
-                                      itemCount: route.searchStops.data.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, ind) {
-                                        return Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      size.width * 0.023),
-                                              child: Container(
-                                                height: 16,
-                                                width: 16,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                ),
-                                                child: Center(
-                                                  child: MyText(
-                                                    text: '${ind + 1}',
-                                                    textStyle: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall!
-                                                        .copyWith(
-                                                            color: AppColors
-                                                                .white),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: MyText(
-                                                text: route.searchStops
-                                                    .data[ind].shortAddress,
-                                                textStyle: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall!
-                                                    .copyWith(fontSize: 13),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16),
-                                              child: VerticalDotDividerWidget(),
-                                            ),
-                                          ],
-                                        );
-                                      },
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: size.width * 0.018),
+                                          child: const DropIcon(),
+                                        ),
+                                        Expanded(
+                                          child: MyText(
+                                            text: route.dropShortAddress,
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(fontSize: 13),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                  const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: VerticalDotDividerWidget(),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: size.width * 0.015),
-                                        child: const DropIcon(),
-                                      ),
-                                      Expanded(
-                                        child: MyText(
-                                          text: route.dropShortAddress,
-                                          textStyle: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .copyWith(fontSize: 13),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -1399,80 +1488,97 @@ class _DestinationPageState extends State<DestinationPage> {
                       .recentSearchPlaces
                       .elementAt(index);
                   return InkWell(
+                    borderRadius: BorderRadius.circular(18),
                     onTap: () {
                       homeBloc.add(
-                            RecentSearchPlaceSelectEvent(
-                                transportType:widget.arg.isOutstationRide 
-                                  ? 'outstation'
-                                  : widget.arg.transportType,
-                                address: recentPlace,
-                                isPickupSelect:
-                                    homeBloc.isPickupSelect),
-                          );
+                        RecentSearchPlaceSelectEvent(
+                            transportType: widget.arg.isOutstationRide
+                                ? 'outstation'
+                                : widget.arg.transportType,
+                            address: recentPlace,
+                            isPickupSelect: homeBloc.isPickupSelect),
+                      );
                     },
-                    child: SizedBox(
-                      height: size.width * 0.14,
-                      child: Row(
-                        children: [
-                          Container(
-                            height: size.height * 0.075,
-                            width: size.width * 0.075,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .disabledColor
-                                  .withAlpha((0.1 * 255).toInt()),
-                              shape: BoxShape.circle,
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.location_pin,
-                              size: 20,
-                              color: Theme.of(context)
-                                  .disabledColor
-                                  .withAlpha((0.75 * 255).toInt()),
-                            ),
-                          ),
-                          SizedBox(width: size.width * 0.025),
-                          SizedBox(
-                            width: size.width * 0.75,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                MyText(
-                                  text: recentPlace.address.split(',')[0],
-                                  textStyle: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                  maxLines: 1,
-                                ),
-                                MyText(
-                                  text: recentPlace.address,
-                                  textStyle: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                          color:
-                                              Theme.of(context).disabledColor),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: size.width * 0.14,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: _brandGradient,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
                           ),
                         ],
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.all(1.3),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: size.height * 0.055,
+                              width: size.height * 0.055,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: _brandGradient,
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.location_pin,
+                                size: 18,
+                                color: AppColors.white,
+                              ),
+                            ),
+                            SizedBox(width: size.width * 0.03),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  MyText(
+                                    text: recentPlace.address.split(',')[0],
+                                    textStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                    maxLines: 1,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  MyText(
+                                    text: recentPlace.address,
+                                    textStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .disabledColor),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
                 separatorBuilder: (context, index) {
-                  return Divider(
-                      color: Theme.of(context)
-                          .dividerColor
-                          .withAlpha((0.5 * 255).toInt()));
+                  return SizedBox(height: size.width * 0.03);
                 },
               ),
               SizedBox(height: size.width * 0.15),
@@ -1488,27 +1594,44 @@ class _DestinationPageState extends State<DestinationPage> {
       height: size.width * 0.1,
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          gradient: _brandGradient,
           boxShadow: [
             BoxShadow(
               offset: const Offset(0, -1),
               color: Theme.of(context).shadowColor,
+              blurRadius: 8,
             )
           ]),
-      child: InkWell(
-        onTap: () {
-          homeBloc.add(SelectFromMapEvent(
-              selectedAddressIndex:
-                  homeBloc.choosenAddressIndex,
-              isPickUpEdit:
-                  homeBloc.isPickupSelect ? true : false));
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.pin_drop_outlined),
-            MyText(text: AppLocalizations.of(context)!.selectFromMap),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.all(1.4),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTap: () {
+              homeBloc.add(SelectFromMapEvent(
+                  selectedAddressIndex: homeBloc.choosenAddressIndex,
+                  isPickUpEdit: homeBloc.isPickupSelect ? true : false));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.pin_drop_outlined, color: _primaryOrange),
+                  const SizedBox(width: 8),
+                  MyText(
+                    text: AppLocalizations.of(context)!.selectFromMap,
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
